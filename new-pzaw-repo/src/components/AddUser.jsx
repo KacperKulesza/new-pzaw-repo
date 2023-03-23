@@ -3,7 +3,6 @@ import Card from '../UI/Card';
 import Button from "../UI/Button";
 import classes from './AddUser.module.css';
 import ErrorModal from "../UI/ErrorModal";
-import MyData from "../UI/MyData";
 
 function AddUser(){
 
@@ -12,6 +11,8 @@ function AddUser(){
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [errorModal, setErrorModal] = useState(null)
+    const [myData, setMyData] = useState('')
+
 
     function nameChangeHandler(event){
         setName(event.target.value)
@@ -65,7 +66,7 @@ function AddUser(){
               method: 'POST',
               body: JSON.stringify(my_object),
               headers:{
-                'Content-Type': 'application.json'
+                'Content-Type': 'application/json'
               }
             })
             console.log(res)
@@ -79,7 +80,7 @@ function AddUser(){
         setErrorModal(null)
     }
 
-    const getDataHandler = useCallback( async () => {
+    const GetDataHandler = useCallback( async () => {
         const res = await fetch('https://react-pzaw-default-rtdb.europe-west1.firebasedatabase.app/users.json')
         const data = await res.json()
         const loadedData = []
@@ -91,12 +92,12 @@ function AddUser(){
             userPassword : data[key].userPassword
           })
         }
-        return(loadedData)
-      })
+        setMyData(loadedData)
+      }, [])
 
     useEffect(() => {
-        getDataHandler()
-      }, [getDataHandler])
+        GetDataHandler()
+      }, [GetDataHandler])
 
     return(
         <>
@@ -118,9 +119,20 @@ function AddUser(){
                     <Button type="submit">Add user</Button>
                 </form>
             </Card>
-            <div>
-                {}
-            </div>
+            <>
+                {Array.isArray(myData) && myData.map(data => {
+                    return(
+                        <ul style={{color: 'white'}}>
+                            <li>{data.userName}</li>
+                            <li>{data.userAge}</li>
+                            <li>{data.userEmail}</li>
+                            <li>{data.userPassword}</li>
+                        </ul>
+                    )
+                })
+
+                }
+            </>
         </>
     );
 }
